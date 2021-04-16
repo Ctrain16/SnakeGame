@@ -102,14 +102,45 @@ const updateSnake = function () {
             snake[i] = [snake[i][0] - 1, snake[i][1]];
           }
           break;
+        case 'none':
+          moving = moving;
+          break;
       }
     } else {
       snake[i] = snake[i - 1];
     }
   }
+
+  const snakeHead = snake[0];
+  for (let i = 1; i < snake.length; i++) {
+    const snakePart = snake[i];
+    if (snakeHead[0] === snakePart[0] && snakeHead[1] === snakePart[1]) {
+      gameOver = true;
+      break;
+    }
+  }
+};
+
+const gameOverPhase = function () {
+  overlay.classList.remove('hidden');
+  resetGameModal.classList.remove('hidden');
+
+  const snakeLength = snake.length;
+  for (const score of scoreLabels) {
+    score.textContent = snakeLength;
+  }
+
+  if (snakeLength > Number(highscoreLabels[0].textContent)) {
+    for (const highscore of highscoreLabels) {
+      highscore.textContent = snakeLength;
+    }
+  }
 };
 
 const resetGame = function () {
+  overlay.classList.add('hidden');
+  resetGameModal.classList.add('hidden');
+
   while (snake.length) snake.pop();
   snake.push([snakeStartX, snakeStartY]);
   moving = snakeStartMoving;
@@ -118,26 +149,42 @@ const resetGame = function () {
   gameOver = false;
 };
 
+const startGame = function () {
+  overlay.classList.add('hidden');
+  startGameModal.classList.add('hidden');
+  setInterval(updateGame, 1000 / 8);
+};
+
 const updateGame = function () {
   if (!gameOver) {
     updateSnake();
-    drawGame();
+    gameOver ? gameOverPhase() : drawGame();
+  } else {
+    gameOverPhase();
   }
 };
 
 // ================ Variables ================ //
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
+
+const startGameModal = document.querySelector('.startModal');
+const startGameButton = document.querySelector('.start-game');
+const resetGameModal = document.querySelector('.resetModal');
+const resetGameButton = document.querySelector('.reset-game');
+const overlay = document.querySelector('.overlay');
+const scoreLabels = document.querySelectorAll('.score');
+const highscoreLabels = document.querySelectorAll('.highscore');
+
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
-
 const gridSize = 16;
 const grid = createGrid(gridSize);
 const tileSize = WIDTH / grid.length;
 
 const snakeStartX = gridSize / 4;
 const snakeStartY = gridSize / 2;
-const snakeStartMoving = 'right';
+const snakeStartMoving = 'none';
 const snake = [[snakeStartX, snakeStartY]];
 let growSnake = false;
 let moving = snakeStartMoving;
@@ -166,6 +213,8 @@ const food = {
 food.spawnFood();
 
 let gameOver = false;
+drawGame();
 
-setInterval(updateGame, 1000 / 8);
 document.addEventListener('keydown', keypress);
+startGameButton.addEventListener('click', startGame);
+resetGameButton.addEventListener('click', resetGame);
