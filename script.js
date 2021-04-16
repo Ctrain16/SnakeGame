@@ -61,14 +61,12 @@ const drawGame = function () {
 };
 
 const updateSnake = function () {
-  if (snake[0][0] === food.x && snake[0][1] === food.y) {
-    growSnake = true;
-    food.spawnFood();
-  }
-
   for (let i = snake.length - 1; i >= 0; i--) {
     if (growSnake) {
       snake.push([snake[snake.length - 1][0], snake[snake.length - 1][1]]);
+      for(const score of scoreLabels){
+        score.textContent = snake.length;
+      }
       growSnake = false;
     }
 
@@ -119,6 +117,11 @@ const updateSnake = function () {
       break;
     }
   }
+
+  if (snake[0][0] === food.x && snake[0][1] === food.y) {
+    growSnake = true;
+    food.spawnFood();
+  }
 };
 
 const gameOverPhase = function () {
@@ -126,10 +129,6 @@ const gameOverPhase = function () {
   resetGameModal.classList.remove('hidden');
 
   const snakeLength = snake.length;
-  for (const score of scoreLabels) {
-    score.textContent = snakeLength;
-  }
-
   if (snakeLength > Number(highscoreLabels[0].textContent)) {
     for (const highscore of highscoreLabels) {
       highscore.textContent = snakeLength;
@@ -140,6 +139,10 @@ const gameOverPhase = function () {
 const resetGame = function () {
   overlay.classList.add('hidden');
   resetGameModal.classList.add('hidden');
+
+  for (const score of scoreLabels) {
+    score.textContent = 0;
+  }
 
   while (snake.length) snake.pop();
   snake.push([snakeStartX, snakeStartY]);
