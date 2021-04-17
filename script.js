@@ -37,11 +37,26 @@ const keypress = function (event) {
   }
 };
 
+const handleResize = function () {
+  let w = window.innerWidth * 0.6; // -2 accounts for the border
+  let h = window.innerHeight * 0.6;
+  w > h ? (w = h) : (h = w);
+
+  canvas.width = w;
+  canvas.height = h;
+
+  width = canvas.width;
+  height = canvas.height;
+  tileSize = width / grid.length;
+
+  drawGame();
+};
+
 const drawGame = function () {
   //Draw Grid
   ctx.fillStyle = 'black';
-  ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillRect(0, 0, width, height);
   ctx.strokeStyle = 'green';
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid.length; j++) {
@@ -64,8 +79,8 @@ const updateSnake = function () {
   for (let i = snake.length - 1; i >= 0; i--) {
     if (growSnake) {
       snake.push([snake[snake.length - 1][0], snake[snake.length - 1][1]]);
-      for(const score of scoreLabels){
-        score.textContent = snake.length;
+      for (const score of scoreLabels) {
+        score.textContent = snake.length - 1;
       }
       growSnake = false;
     }
@@ -128,7 +143,7 @@ const gameOverPhase = function () {
   overlay.classList.remove('hidden');
   resetGameModal.classList.remove('hidden');
 
-  const snakeLength = snake.length;
+  const snakeLength = snake.length - 1;
   if (snakeLength > Number(highscoreLabels[0].textContent)) {
     for (const highscore of highscoreLabels) {
       highscore.textContent = snakeLength;
@@ -179,11 +194,11 @@ const overlay = document.querySelector('.overlay');
 const scoreLabels = document.querySelectorAll('.score');
 const highscoreLabels = document.querySelectorAll('.highscore');
 
-const WIDTH = canvas.width;
-const HEIGHT = canvas.height;
 const gridSize = 16;
 const grid = createGrid(gridSize);
-const tileSize = WIDTH / grid.length;
+let width = canvas.width;
+let height = canvas.height;
+let tileSize = width / grid.length;
 
 const snakeStartX = gridSize / 4;
 const snakeStartY = gridSize / 2;
@@ -216,8 +231,9 @@ const food = {
 food.spawnFood();
 
 let gameOver = false;
-drawGame();
+handleResize();
 
+window.addEventListener('resize', handleResize);
 document.addEventListener('keydown', keypress);
 startGameButton.addEventListener('click', startGame);
 resetGameButton.addEventListener('click', resetGame);

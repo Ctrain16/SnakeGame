@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snake Game</title>
+    <title>🐍 Snake Game 🐍</title>
     <link href="style.css" rel="stylesheet" />
   </head>
   <body>
     <header>
-      <h1>Snake Game</h1>
+      <h1>Snake Game 🐍</h1>
       <div class="score-labels">
         <p class="label-score">💯 Score: <span class="score">0</span></p>
         <p class="label-highscore">
@@ -21,17 +21,21 @@
     <main>
       <canvas class="canvas" width="450" height="450"></canvas>
       <div class="modal startModal">
-        <h2>Snake Game 🐍</h2>
-        <h3>Controls: <span>WASD or Arrow keys</span></h3>
-        <button class="start-game">Start Game</button>
+        <div class="modal-content">
+          <h3>Controls</h3>
+          <p>WASD or Arrow Keys</p>
+          <button class="btn start-game">Start Game</button>
+        </div>
       </div>
       <div class="modal resetModal hidden">
-        <h2>Game Over 😢</h2>
-        <p class="label-score">💯 Score: <span class="score">0</span></p>
-        <p class="label-highscore">
-          🏆 Highscore: <span class="highscore">0</span>
-        </p>
-        <button class="reset-game">Play Again</button>
+        <div class="modal-content">
+          <h3>Game Over 😢</h3>
+          <p class="modal-score">💯 Score: <span class="score">0</span></p>
+          <p class="modal-highscore">
+            🏆 Highscore: <span class="highscore">0</span>
+          </p>
+          <button class="btn reset-game">Play Again</button>
+        </div>
       </div>
     </main>
 
