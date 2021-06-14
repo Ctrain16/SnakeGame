@@ -65,9 +65,14 @@ const drawGame = function () {
   }
 
   //Draw Snake
-  for (const [x, y] of snake) {
+  for (const snakePart of snake) {
     ctx.fillStyle = 'white';
-    ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    ctx.fillRect(
+      snakePart.x * tileSize,
+      snakePart.y * tileSize,
+      tileSize,
+      tileSize
+    );
   }
 
   //Draw Food
@@ -78,7 +83,10 @@ const drawGame = function () {
 const updateSnake = function () {
   for (let i = snake.length - 1; i >= 0; i--) {
     if (growSnake) {
-      snake.push([snake[snake.length - 1][0], snake[snake.length - 1][1]]);
+      snake.push({
+        x: snake[snake.length - 1].x,
+        y: snake[snake.length - 1].y,
+      });
       for (const score of scoreLabels) {
         score.textContent = snake.length - 1;
       }
@@ -88,31 +96,31 @@ const updateSnake = function () {
     if (i === 0) {
       switch (moving) {
         case 'up':
-          if (snake[i][1] === 0) {
+          if (snake[i].y === 0) {
             gameOver = true;
           } else {
-            snake[i] = [snake[i][0], snake[i][1] - 1];
+            snake[i].y--;
           }
           break;
         case 'down':
-          if (snake[i][1] === gridSize - 1) {
+          if (snake[i].y === gridSize - 1) {
             gameOver = true;
           } else {
-            snake[i] = [snake[i][0], snake[i][1] + 1];
+            snake[i].y++;
           }
           break;
         case 'right':
-          if (snake[i][0] === gridSize - 1) {
+          if (snake[i].x === gridSize - 1) {
             gameOver = true;
           } else {
-            snake[i] = [snake[i][0] + 1, snake[i][1]];
+            snake[i].x++;
           }
           break;
         case 'left':
-          if (snake[i][0] === 0) {
+          if (snake[i].x === 0) {
             gameOver = true;
           } else {
-            snake[i] = [snake[i][0] - 1, snake[i][1]];
+            snake[i].x--;
           }
           break;
         case 'none':
@@ -127,13 +135,13 @@ const updateSnake = function () {
   const snakeHead = snake[0];
   for (let i = 1; i < snake.length; i++) {
     const snakePart = snake[i];
-    if (snakeHead[0] === snakePart[0] && snakeHead[1] === snakePart[1]) {
+    if (snakeHead.x === snakePart.x && snakeHead.y === snakePart.x) {
       gameOver = true;
       break;
     }
   }
 
-  if (snake[0][0] === food.x && snake[0][1] === food.y) {
+  if (snake[0].x === food.x && snake[0].y === food.y) {
     growSnake = true;
     food.spawnFood();
   }
@@ -160,7 +168,7 @@ const resetGame = function () {
   }
 
   while (snake.length) snake.pop();
-  snake.push([snakeStartX, snakeStartY]);
+  snake.push({ x: snakeStartX, y: snakeStartY });
   moving = snakeStartMoving;
 
   food.spawnFood();
@@ -179,6 +187,54 @@ const updateGame = function () {
     gameOver ? gameOverPhase() : drawGame();
   } else {
     gameOverPhase();
+  }
+};
+
+const calcClickPosition = function (canvas, event) {
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  return { x, y };
+};
+
+const calcSnakeHeadPos = function () {
+  const x = snake[0].x * tileSize + tileSize / 2;
+  const y = snake[0].y * tileSize + tileSize / 2;
+  return { x, y };
+};
+
+const calcDiagonalQuadrant = function (snakePos, clickPos, movX, movY) {
+  if (Math.abs(snakePos.x - clickPos.x) > Math.abs(snakePos.y - clickPos.y)) {
+    if (movX === 'left') {
+      if (moving !== 'right') moving = movX;
+    } else {
+      if (moving !== 'left') moving = movX;
+    }
+  } else {
+    if (movY === 'up') {
+      if (moving !== 'down') moving = movY;
+    } else {
+      if (moving !== 'up') moving = movY;
+    }
+  }
+};
+
+const calcClickDirection = function (event) {
+  const clickPos = calcClickPosition(canvas, event);
+  const snakePos = calcSnakeHeadPos();
+
+  if (clickPos.x > snakePos.x && clickPos.y >= snakePos.y) {
+    // bottom right
+    calcDiagonalQuadrant(snakePos, clickPos, 'right', 'down');
+  } else if (clickPos.x >= snakePos.x && clickPos.y < snakePos.y) {
+    // top right
+    calcDiagonalQuadrant(snakePos, clickPos, 'right', 'up');
+  } else if (clickPos.x < snakePos.x && clickPos.y <= snakePos.y) {
+    // top left
+    calcDiagonalQuadrant(snakePos, clickPos, 'left', 'up');
+  } else {
+    // bottom left
+    calcDiagonalQuadrant(snakePos, clickPos, 'left', 'down');
   }
 };
 
@@ -203,7 +259,7 @@ let tileSize = width / grid.length;
 const snakeStartX = gridSize / 4;
 const snakeStartY = gridSize / 2;
 const snakeStartMoving = 'none';
-const snake = [[snakeStartX, snakeStartY]];
+const snake = [{ x: snakeStartX, y: snakeStartY }];
 let growSnake = false;
 let moving = snakeStartMoving;
 
@@ -219,7 +275,7 @@ const food = {
       this.x = Math.trunc(Math.random() * gridSize);
       this.y = Math.trunc(Math.random() * gridSize);
 
-      for (const [snakeX, snakeY] of snake) {
+      for (const { x: snakeX, y: snakeY } of snake) {
         if (this.x === snakeX && this.y === snakeY) {
           invalidSpawn = true;
           break;
@@ -237,3 +293,4 @@ window.addEventListener('resize', handleResize);
 document.addEventListener('keydown', keypress);
 startGameButton.addEventListener('click', startGame);
 resetGameButton.addEventListener('click', resetGame);
+canvas.addEventListener('mousedown', calcClickDirection);
