@@ -99,28 +99,28 @@ const updateSnake = function () {
           if (snake[i].y === 0) {
             gameOver = true;
           } else {
-            snake[i].y--;
+            --snake[i].y;
           }
           break;
         case 'down':
           if (snake[i].y === gridSize - 1) {
             gameOver = true;
           } else {
-            snake[i].y++;
+            ++snake[i].y;
           }
           break;
         case 'right':
           if (snake[i].x === gridSize - 1) {
             gameOver = true;
           } else {
-            snake[i].x++;
+            ++snake[i].x;
           }
           break;
         case 'left':
           if (snake[i].x === 0) {
             gameOver = true;
           } else {
-            snake[i].x--;
+            --snake[i].x;
           }
           break;
         case 'none':
@@ -128,14 +128,14 @@ const updateSnake = function () {
           break;
       }
     } else {
-      snake[i] = snake[i - 1];
+      snake[i] = Object.assign({}, snake[i - 1]);
     }
   }
 
   const snakeHead = snake[0];
   for (let i = 1; i < snake.length; i++) {
     const snakePart = snake[i];
-    if (snakeHead.x === snakePart.x && snakeHead.y === snakePart.x) {
+    if (snakeHead.x === snakePart.x && snakeHead.y === snakePart.y) {
       gameOver = true;
       break;
     }
