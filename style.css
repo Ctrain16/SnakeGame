@@ -64,6 +64,7 @@ main {
 
 .canvas {
   border: 2px solid green;
+  min-width: 300px;
 }
 
 /****** Footer *****/
@@ -86,7 +87,7 @@ footer {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 30%;
-  min-width: 100px;
+  min-width: 300px;
   max-width: 400px;
 
   background-color: white;
@@ -122,6 +123,7 @@ footer {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 5;
+  min-width: 300px;
 }
 
 .btn {
