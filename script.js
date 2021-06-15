@@ -153,6 +153,7 @@ const gameOverPhase = function () {
 
   const snakeLength = snake.length - 1;
   if (snakeLength > Number(highscoreLabels[0].textContent)) {
+    localStorage.setItem('highscore', snakeLength);
     for (const highscore of highscoreLabels) {
       highscore.textContent = snakeLength;
     }
@@ -249,6 +250,11 @@ const resetGameButton = document.querySelector('.reset-game');
 const overlay = document.querySelector('.overlay');
 const scoreLabels = document.querySelectorAll('.score');
 const highscoreLabels = document.querySelectorAll('.highscore');
+if (localStorage.getItem('highscore')) {
+  for (const highscore of highscoreLabels) {
+    highscore.textContent = localStorage.getItem('highscore');
+  }
+}
 
 const gridSize = 16;
 const grid = createGrid(gridSize);
